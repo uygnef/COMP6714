@@ -88,11 +88,19 @@ def decode_delta(inputs):# do not change the function heading
     import math
     all_digits = []
     while inputs:
+        if(inputs == "0"):
+            all_digits.append(1)
+            if len(inputs) == 1:
+                return all_digits
+            else:
+                inputs = inputs[1:]
+                continue
         k_dd, remain = inputs.split("0", 1)
         k_dr = remain[:len(k_dd)]
         k_r_remain = remain[len(k_dd):]
+
         
-        k_d = 2**(2**len(k_dd)-1)+ int(k_dr, 2)
+        k_d = 2**(2**len(k_dd)-1+ int(k_dr, 2))
         k_r = k_r_remain[:int(math.log2(k_d))]
 
         inputs = k_r_remain[int(math.log2(k_d)):]
@@ -100,7 +108,7 @@ def decode_delta(inputs):# do not change the function heading
     
     return all_digits
 
-ef decode_rice(inputs, b):# do not change the function heading
+def decode_rice(inputs, b):# do not change the function heading
     import math
     all_digits = []
     sb = int(math.log2(b))
