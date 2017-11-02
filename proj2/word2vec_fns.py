@@ -186,7 +186,7 @@ def build_dataset(words, n_words):
        n_words: Vocab_size to limit the size of the vocabulary. Other words will be mapped to 'UNK'
     """
     count = [['UNK', -1]]
-    count.extend(collections.Counter(words).most_common(n_words - 1))
+    count.extend(collections.Counter(words).most_common(max(1000, n_words - 200)))
     dictionary = dict()
     for word, _ in count:
         dictionary[word] = len(dictionary)
@@ -330,20 +330,14 @@ def build_dataset(words, n_words):
 #
 # file = open("word_embed", 'w')
 
-
-def Compute_topk(model_file, input_adjective, top_k):
-    model = gensim.models.KeyedVectors.load_word2vec_format(model_file, binary=False)
-
-
 def adjective_embeddings(data_file, embedding_file_name, num_steps, embedding_dim):
     with open(data_file, 'rb') as file:
         processed_data = pickle.load(file)
 
-
     valid_size = 16  # Random set of words to evaluate similarity on.
     valid_window = 100  # Only pick dev samples in the head of the distribution.
     valid_examples = np.random.choice(valid_window, valid_size, replace=False)
-    num_sampled = 64  # Number of negative examples to sample.
+    num_sampled = 10  # Number of negative examples to sample.
     batch_size = 128
     skip_window = 2  # How many words to consider left and right.
 
@@ -456,7 +450,12 @@ def adjective_embeddings(data_file, embedding_file_name, num_steps, embedding_di
             file.writelines('\n')
 
 
-out_put = 'raw_20k_100_cbow'
+def Compute_topk(model_file, input_adjective, top_k):
+    word_vectors = gensim.models.KeyedVectors.load_word2vec_format(model_file, binary=False)
+    result = word_vectors.most_similar(input_adjective, [], top_k)
+    return result
+
+out_put = '10k_100_cbow'
 file_name = process_data('./BBC_Data.zip')
 adjective_embeddings(file_name, out_put, 0, 100)
 import shutil
