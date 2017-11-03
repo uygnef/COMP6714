@@ -341,7 +341,7 @@ def adjective_embeddings(data_file, embedding_file_name, num_steps, embedding_di
     batch_size = 128
     skip_window = 2  # How many words to consider left and right.
 
-    data, count, dictionary, reverse_dictionary = build_dataset(processed_data, 20782)
+    data, count, dictionary, reverse_dictionary = build_dataset(processed_data, 20000)
     vocabulary_size = len(reverse_dictionary.keys())  # This variable is used to define the maximum vocabulary size.
     print(vocabulary_size)
     prob_dict = get_probabilty(data)
@@ -457,6 +457,6 @@ def Compute_topk(model_file, input_adjective, top_k):
 
 out_put = '10k_100_cbow'
 file_name = process_data('./BBC_Data.zip')
-adjective_embeddings(file_name, out_put, 0, 100)
+adjective_embeddings(file_name, out_put, 0, 100000)
 import shutil
 shutil.copyfile('word2vec_fns.py', out_put+".py")
