@@ -10,6 +10,7 @@ import random
 from tempfile import gettempdir
 import zipfile
 from six.moves import xrange
+import gensim
 
 import numpy as np
 from six.moves import urllib
@@ -186,7 +187,7 @@ def build_dataset(words, n_words):
        n_words: Vocab_size to limit the size of the vocabulary. Other words will be mapped to 'UNK'
     """
     count = [['UNK', -1]]
-    count.extend(collections.Counter(words).most_common(max(1000, n_words - 200)))
+    count.extend(collections.Counter(words).most_common(max(1000, n_words - 1)))
     dictionary = dict()
     for word, _ in count:
         dictionary[word] = len(dictionary)
@@ -341,7 +342,7 @@ def adjective_embeddings(data_file, embedding_file_name, num_steps, embedding_di
     batch_size = 128
     skip_window = 2  # How many words to consider left and right.
 
-    data, count, dictionary, reverse_dictionary = build_dataset(processed_data, 20000)
+    data, count, dictionary, reverse_dictionary = build_dataset(processed_data, 15000)
     vocabulary_size = len(reverse_dictionary.keys())  # This variable is used to define the maximum vocabulary size.
     print(vocabulary_size)
     prob_dict = get_probabilty(data)
@@ -436,8 +437,6 @@ def adjective_embeddings(data_file, embedding_file_name, num_steps, embedding_di
                         close_word = reverse_dictionary[nearest[k]]
                         log_str = '%s %s,' % (log_str, close_word)
                     print(log_str)
-                np.save("CBOW_Embeddings", normalized_embeddings.eval())
-                saver.save(session, 'w2vEmbedding', global_step=step)
 
         final_embeddings = normalized_embeddings.eval()
 
@@ -455,8 +454,9 @@ def Compute_topk(model_file, input_adjective, top_k):
     result = word_vectors.most_similar(input_adjective, [], top_k)
     return result
 
-out_put = '10k_100_cbow'
+out_put = '10k_200_cbow'
 file_name = process_data('./BBC_Data.zip')
-adjective_embeddings(file_name, out_put, 0, 100000)
+adjective_embeddings(file_name, out_put, 1000000, 200)
 import shutil
 shutil.copyfile('word2vec_fns.py', out_put+".py")
+
