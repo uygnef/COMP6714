@@ -87,7 +87,6 @@ def process_data(input_data):
     data = ''
     with zipfile.ZipFile(input_data) as f:
         for i in f.namelist():
-            print(i)
             data += tf.compat.as_str(f.read(i)).strip()
     nlp = spacy.load('en')
     paredDate = nlp(data)
@@ -138,7 +137,6 @@ def build_dataset(words, n_words):
         dictionary[word] = len(dictionary)
     data = list()
     unk_count = 0
-    print(dictionary)
     for word in words:
         index = dictionary.get(word, 0)
         if index == 0:  # i.e., one of the 'UNK' words
@@ -162,7 +160,6 @@ def adjective_embeddings(data_file, embedding_file_name, num_steps, embedding_di
 
     data, count, dictionary, reverse_dictionary = build_dataset(processed_data, 15000)
     vocabulary_size = len(reverse_dictionary.keys())  # This variable is used to define the maximum vocabulary size.
-    print(vocabulary_size)
     prob_dict = get_probabilty(data)
 
     graph = tf.Graph()
@@ -224,7 +221,7 @@ def adjective_embeddings(data_file, embedding_file_name, num_steps, embedding_di
     with tf.Session(graph=graph) as session:
         # We must initialize all variables before we use them.
         init.run()
-        print('Initialized')
+        # print('Initialized')
 
         average_loss = 0
         for step in xrange(num_steps):
@@ -240,21 +237,21 @@ def adjective_embeddings(data_file, embedding_file_name, num_steps, embedding_di
                 if step > 0:
                     average_loss /= 2000
                 # The average loss is an estimate of the loss over the last 2000 batches.
-                print('Average loss at step ', step, ': ', average_loss)
+                # print('Average loss at step ', step, ': ', average_loss)
                 average_loss = 0
 
             # Note that this is expensive (~20% slowdown if computed every 500 steps)
-            if step % 10000 == 0:
-                sim = similarity.eval()
-                for i in range(valid_size):
-                    valid_word = reverse_dictionary[valid_examples[i]]
-                    top_k = 8  # number of nearest neighbors
-                    nearest = (-sim[i, :]).argsort()[1:top_k + 1]
-                    log_str = 'Nearest to %s:' % valid_word
-                    for k in range(top_k):
-                        close_word = reverse_dictionary[nearest[k]]
-                        log_str = '%s %s,' % (log_str, close_word)
-                    print(log_str)
+            # if step % 10000 == 0:
+            #     sim = similarity.eval()
+            #     for i in range(valid_size):
+            #         valid_word = reverse_dictionary[valid_examples[i]]
+            #         top_k = 8  # number of nearest neighbors
+            #         nearest = (-sim[i, :]).argsort()[1:top_k + 1]
+            #         log_str = 'Nearest to %s:' % valid_word
+            #         for k in range(top_k):
+            #             close_word = reverse_dictionary[nearest[k]]
+            #             log_str = '%s %s,' % (log_str, close_word)
+            #         # print(log_str)
 
         final_embeddings = normalized_embeddings.eval()
 
@@ -271,7 +268,6 @@ def Compute_topk(model_file, input_adjective, top_k):
     nlp = spacy.load('en')
     tag = nlp(input_adjective)[0].pos_
     word_vectors = gensim.models.KeyedVectors.load_word2vec_format(model_file, binary=False)
-    print(word_vectors)
     result = word_vectors.most_similar(input_adjective, [], 1000)
     res = []
     for i in result:
@@ -284,6 +280,7 @@ def Compute_topk(model_file, input_adjective, top_k):
 
 
 if __name__ == '__main__':
+    pass
     # out_put = '10k_200_cbow'
     # file_name = process_data('./BBC_Data.zip')
     # adjective_embeddings(file_name, out_put, 1000000, 200)
